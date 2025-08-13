@@ -1,0 +1,73 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Environment ###
+.env
+.env.local
+.env.*.local
+
+### Logs ###
+logs/
+*.log
+
+### JaCoCo Coverage ###
+*.exec
+*.coverage
+jacoco.exec
+
+### Redis Data ###
+dump.rdb
+*.rdb
+
+### Test Reports ###
+surefire-reports/
+failsafe-reports/
+
+### OS Files ###
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+### JVM Crash Logs ###
+hs_err_pid*
+replay_pid*
+
+### Maven Wrapper ###
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### Spring Boot ###
+*.pid
+spring.log
