@@ -1,0 +1,13 @@
+# <type>: <short description>
+#
+# <longer description if needed>
+#
+# Types: feat, fix, docs, style, refactor, test, chore
+# Examples:
+# feat: add semantic similarity caching
+# fix: resolve Redis connection timeout
+# test: add comprehensive mock framework
+# docs: update API documentation
+
+# Footer (optional)
+# Co-Authored-By: Claude <noreply@anthropic.com>
