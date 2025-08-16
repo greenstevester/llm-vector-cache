@@ -1,20 +1,15 @@
+---
 spring:
   redis:
-    host: ${REDIS_HOST:redis}
-    port: ${REDIS_PORT:6379}
-    password: ${REDIS_PASSWORD:}
-
-openai:
-  api:
-    key: ${OPENAI_API_KEY}
-
+    host: "${REDIS_HOST:redis}"
+    port: "${REDIS_PORT:6379}"
+    password: "${REDIS_PASSWORD:}"
 cache:
   similarity:
-    threshold: ${CACHE_SIMILARITY_THRESHOLD:0.95}
+    threshold: "${CACHE_SIMILARITY_THRESHOLD:0.95}"
   ttl:
-    hours: ${CACHE_TTL_HOURS:24}
-
+    hours: "${CACHE_TTL_HOURS:24}"
 logging:
   level:
-    com.example.llmcache: INFO
-    root: WARN
+    com.example.llmcache: "INFO"
+    root: "WARN"

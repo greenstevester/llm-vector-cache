@@ -1,10 +1,12 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this
+repository.
 
 ## Common Development Commands
 
 ### Build and Run
+
 ```bash
 # Build the project
 mvn clean install
@@ -20,6 +22,7 @@ mvn spring-boot:run
 ```
 
 ### Docker Operations
+
 ```bash
 # Start Redis only
 cd docker && docker-compose up -d redis
@@ -33,6 +36,7 @@ docker build -f docker/Dockerfile -t llm-cache-app .
 ```
 
 ### Testing
+
 ```bash
 # Run unit tests
 mvn test
@@ -44,15 +48,19 @@ curl -X POST http://localhost:8080/api/llm/generate -H "Content-Type: applicatio
 
 ## Architecture Overview
 
-This is a Spring Boot application implementing a dual-layer LLM cache with vector similarity matching:
+This is a Spring Boot application implementing a dual-layer LLM cache with vector similarity
+matching:
 
 ### Core Components
 
 1. **Dual-Layer Caching Strategy**
+
    - **Exact Match Cache**: Direct string hash lookup via Redis (MD5 hash keys)
-   - **Semantic Cache**: Vector similarity search using OpenAI embeddings with configurable cosine similarity threshold
+   - **Semantic Cache**: Vector similarity search using OpenAI embeddings with configurable cosine
+     similarity threshold
 
 2. **Service Layer Architecture**
+
    - `LLMService`: Orchestrates cache lookups and OpenAI API calls
    - `VectorCacheService`: Manages Redis operations, vector indexing, and similarity searches
    - `EmbeddingService`: Handles OpenAI embedding generation and cosine similarity calculations
@@ -66,11 +74,13 @@ This is a Spring Boot application implementing a dual-layer LLM cache with vecto
 ### Configuration
 
 Key settings in `application.yml`:
+
 - `cache.similarity.threshold`: Cosine similarity threshold (default: 0.95)
 - `cache.ttl.hours`: Cache entry TTL (default: 24 hours)
-- `openai.embedding.model`: Embedding model (default: text-embedding-ada-002)
+- `llmprovider.openai.model`: OpenAI embedding model (default: text-embedding-ada-002)
 
 Environment requirements:
+
 - `OPENAI_API_KEY`: Required for OpenAI API access
 - `REDIS_HOST`: Redis hostname (default: localhost)
 - `REDIS_PORT`: Redis port (default: 6379)

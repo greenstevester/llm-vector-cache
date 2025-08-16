@@ -1,0 +1,69 @@
+# Compiled output
+target/
+build/
+dist/
+out/
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Spring Boot
+application-local.properties
+application-local.yml
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Test files that should not be formatted
+**/*.min.js
+**/*.min.css
+
+# Generated files
+generated/
+auto-generated/
+
+# License files
+LICENSE*
+NOTICE*
+
+# Changelog files that have specific formatting
+CHANGELOG*

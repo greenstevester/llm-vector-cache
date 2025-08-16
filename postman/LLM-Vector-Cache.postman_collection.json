@@ -1,375 +1,18 @@
 {
-  "info": {
-    "name": "LLM Vector Cache API",
-    "description": "Collection for testing the LLM Vector Cache API with Spring Boot, Redis, and OpenAI integration. This collection includes examples for cache operations, health checks, and various LLM prompt scenarios.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "item": [
-    {
-      "name": "Health & Monitoring",
-      "item": [
-        {
-          "name": "Health Check",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "health"]
-            },
-            "description": "Check if the LLM service is healthy and responsive"
-          }
-        },
-        {
-          "name": "Cache Statistics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/cache/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "cache", "stats"]
-            },
-            "description": "Get detailed cache statistics including hit rate, total entries, and memory usage"
-          }
-        },
-        {
-          "name": "Actuator Health",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/actuator/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["actuator", "health"]
-            },
-            "description": "Spring Boot Actuator health endpoint for detailed application health"
-          }
-        },
-        {
-          "name": "Actuator Metrics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/actuator/metrics",
-              "host": ["{{baseUrl}}"],
-              "path": ["actuator", "metrics"]
-            },
-            "description": "Get all available application metrics"
-          }
-        }
-      ]
-    },
-    {
-      "name": "LLM Generation",
-      "item": [
-        {
-          "name": "Simple Question (GPT-3.5)",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"What is the capital of France?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Simple factual question that should be cached after first call"
-          }
-        },
-        {
-          "name": "Code Generation Request",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Write a Python function to calculate the factorial of a number using recursion\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.2,\n    \"max_tokens\": 200\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Code generation request with lower temperature for more deterministic output"
-          }
-        },
-        {
-          "name": "Semantic Similar Question 1",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"What's the capital city of France?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Semantically similar to 'What is the capital of France?' - should trigger semantic cache hit"
-          }
-        },
-        {
-          "name": "Semantic Similar Question 2",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Tell me the capital of France please\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Another semantic variation - should hit cache if similarity threshold is properly configured"
-          }
-        },
-        {
-          "name": "Complex Analysis Request",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Explain the differences between Redis and Memcached for caching, including pros and cons of each\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.5,\n    \"max_tokens\": 500\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Complex technical analysis request with higher token limit"
-          }
-        },
-        {
-          "name": "GPT-4 Model Request",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Design a microservices architecture for an e-commerce platform with high availability requirements\",\n  \"options\": {\n    \"model\": \"gpt-4\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 800\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Using GPT-4 model for more complex architectural design questions"
-          }
-        },
-        {
-          "name": "Creative Writing Request",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Write a short story about a developer who discovers their code has become sentient\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.9,\n    \"max_tokens\": 600\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Creative request with high temperature for more varied output"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Cache Management",
-      "item": [
-        {
-          "name": "Evict Expired Entries",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/cache/evict",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "cache", "evict"]
-            },
-            "description": "Manually trigger eviction of expired cache entries"
-          }
-        }
-      ]
-    },
-    {
-      "name": "Test Scenarios",
-      "item": [
-        {
-          "name": "Test Exact Cache Hit",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"What is 2 + 2?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0,\n    \"max_tokens\": 50\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Run this twice - second call should be an exact cache hit (check response headers or logs)"
-          }
-        },
-        {
-          "name": "Test Semantic Cache Hit",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"What's two plus two?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0,\n    \"max_tokens\": 50\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Should hit semantic cache if 'What is 2 + 2?' was called before"
-          }
-        },
-        {
-          "name": "Test Different Model Cache Isolation",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"What is 2 + 2?\",\n  \"options\": {\n    \"model\": \"gpt-4\",\n    \"temperature\": 0,\n    \"max_tokens\": 50\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Same prompt but different model - should NOT hit cache from gpt-3.5-turbo"
-          }
-        },
-        {
-          "name": "Test Empty Prompt Error",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\"\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Test error handling with empty prompt"
-          }
-        },
-        {
-          "name": "Test Missing Model",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"prompt\": \"Test prompt\",\n  \"options\": {}\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/llm/generate",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "llm", "generate"]
-            },
-            "description": "Test request without specifying model"
-          }
-        }
-      ]
-    }
-  ],
   "event": [
     {
       "listen": "prerequest",
       "script": {
-        "type": "text/javascript",
         "exec": [
           "// Add timestamp to requests for tracking",
           "pm.variables.set('timestamp', new Date().toISOString());"
-        ]
+        ],
+        "type": "text/javascript"
       }
     },
     {
       "listen": "test",
       "script": {
-        "type": "text/javascript",
         "exec": [
           "// Common test to check response time",
           "pm.test('Response time is less than 5000ms', function () {",
@@ -382,21 +25,480 @@
           "        pm.response.to.have.status(pm.response.code);",
           "    });",
           "}"
-        ]
+        ],
+        "type": "text/javascript"
       }
+    }
+  ],
+  "info": {
+    "description": "Collection for testing the LLM Vector Cache API with Spring Boot, Redis, and OpenAI integration. This collection includes examples for cache operations, health checks, and various LLM prompt scenarios.",
+    "name": "LLM Vector Cache API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "description": "Check if the LLM service is healthy and responsive",
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "health"
+              ],
+              "raw": "{{baseUrl}}/api/llm/health"
+            }
+          }
+        },
+        {
+          "name": "Cache Statistics",
+          "request": {
+            "description": "Get detailed cache statistics including hit rate, total entries, and memory usage",
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "cache",
+                "stats"
+              ],
+              "raw": "{{baseUrl}}/api/llm/cache/stats"
+            }
+          }
+        },
+        {
+          "name": "Actuator Health",
+          "request": {
+            "description": "Spring Boot Actuator health endpoint for detailed application health",
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ],
+              "raw": "{{baseUrl}}/actuator/health"
+            }
+          }
+        },
+        {
+          "name": "Actuator Metrics",
+          "request": {
+            "description": "Get all available application metrics",
+            "header": [],
+            "method": "GET",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "metrics"
+              ],
+              "raw": "{{baseUrl}}/actuator/metrics"
+            }
+          }
+        }
+      ],
+      "name": "Health & Monitoring"
+    },
+    {
+      "item": [
+        {
+          "name": "Simple Question (GPT-3.5)",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"What is the capital of France?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
+            },
+            "description": "Simple factual question that should be cached after first call",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Code Generation Request",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Write a Python function to calculate the factorial of a number using recursion\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.2,\n    \"max_tokens\": 200\n  }\n}"
+            },
+            "description": "Code generation request with lower temperature for more deterministic output",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Semantic Similar Question 1",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"What's the capital city of France?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
+            },
+            "description": "Semantically similar to 'What is the capital of France?' - should trigger semantic cache hit",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Semantic Similar Question 2",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Tell me the capital of France please\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
+            },
+            "description": "Another semantic variation - should hit cache if similarity threshold is properly configured",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Complex Analysis Request",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Explain the differences between Redis and Memcached for caching, including pros and cons of each\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.5,\n    \"max_tokens\": 500\n  }\n}"
+            },
+            "description": "Complex technical analysis request with higher token limit",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "GPT-4 Model Request",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Design a microservices architecture for an e-commerce platform with high availability requirements\",\n  \"options\": {\n    \"model\": \"gpt-4\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 800\n  }\n}"
+            },
+            "description": "Using GPT-4 model for more complex architectural design questions",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Creative Writing Request",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Write a short story about a developer who discovers their code has become sentient\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.9,\n    \"max_tokens\": 600\n  }\n}"
+            },
+            "description": "Creative request with high temperature for more varied output",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        }
+      ],
+      "name": "LLM Generation"
+    },
+    {
+      "item": [
+        {
+          "name": "Evict Expired Entries",
+          "request": {
+            "description": "Manually trigger eviction of expired cache entries",
+            "header": [],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "cache",
+                "evict"
+              ],
+              "raw": "{{baseUrl}}/api/llm/cache/evict"
+            }
+          }
+        }
+      ],
+      "name": "Cache Management"
+    },
+    {
+      "item": [
+        {
+          "name": "Test Exact Cache Hit",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"What is 2 + 2?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0,\n    \"max_tokens\": 50\n  }\n}"
+            },
+            "description": "Run this twice - second call should be an exact cache hit (check response headers or logs)",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Test Semantic Cache Hit",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"What's two plus two?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0,\n    \"max_tokens\": 50\n  }\n}"
+            },
+            "description": "Should hit semantic cache if 'What is 2 + 2?' was called before",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Test Different Model Cache Isolation",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"What is 2 + 2?\",\n  \"options\": {\n    \"model\": \"gpt-4\",\n    \"temperature\": 0,\n    \"max_tokens\": 50\n  }\n}"
+            },
+            "description": "Same prompt but different model - should NOT hit cache from gpt-3.5-turbo",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Test Empty Prompt Error",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\"\n  }\n}"
+            },
+            "description": "Test error handling with empty prompt",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        },
+        {
+          "name": "Test Missing Model",
+          "request": {
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"prompt\": \"Test prompt\",\n  \"options\": {}\n}"
+            },
+            "description": "Test request without specifying model",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "url": {
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "llm",
+                "generate"
+              ],
+              "raw": "{{baseUrl}}/api/llm/generate"
+            }
+          }
+        }
+      ],
+      "name": "Test Scenarios"
     }
   ],
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080",
-      "type": "string"
+      "type": "string",
+      "value": "http://localhost:8080"
     },
     {
+      "description": "Your OpenAI API key (set in environment variables)",
       "key": "openai_api_key",
-      "value": "your-openai-api-key-here",
       "type": "string",
-      "description": "Your OpenAI API key (set in environment variables)"
+      "value": "your-openai-api-key-here"
     }
   ]
 }

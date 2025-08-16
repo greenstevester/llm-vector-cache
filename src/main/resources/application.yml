@@ -1,43 +1,34 @@
+---
 spring:
   redis:
-    host: localhost
-    port: 6379
-    timeout: 2000ms
+    host: "${REDIS_HOST:localhost}"
+    port: "${REDIS_PORT:6379}"
+    timeout: "2000ms"
     jedis:
       pool:
         max-active: 8
         max-idle: 8
         min-idle: 0
-
-openai:
-  api:
-    key: ${OPENAI_API_KEY}
-  embedding:
-    model: text-embedding-ada-002
-
 cache:
   similarity:
     threshold: 0.95
   ttl:
     hours: 24
-
 logging:
   level:
-    com.example.llmcache: DEBUG
-    org.springframework.data.redis: INFO
-    io.redisearch: INFO
-    org.springframework.web: INFO
-
+    com.example.llmcache: "DEBUG"
+    org.springframework.data.redis: "INFO"
+    io.redisearch: "INFO"
+    org.springframework.web: "INFO"
 server:
   port: 8080
   error:
     whitelabel:
       enabled: false
-    include-message: always
-    include-binding-errors: always
-
+    include-message: "always"
+    include-binding-errors: "always"
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: "health,info,metrics"

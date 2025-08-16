@@ -1,0 +1,7 @@
+---
+llmprovider:
+  active: "openai"
+  openai:
+    api-key: "${OPENAI_API_KEY:}"
+    model: "text-embedding-ada-002"
+    base-url: "https://api.openai.com/v1"

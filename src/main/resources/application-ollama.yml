@@ -1,0 +1,17 @@
+---
+llmprovider:
+  active: "ollama"
+  ollama:
+    base-url: "http://10.0.0.125:11434"
+    model: "qwen2.5-coder:3b"
+    dimension: 4096
+    timeout: 30000
+cache:
+  similarity:
+    threshold: 0.85
+  ttl:
+    hours: 24
+logging:
+  level:
+    com.example.llmcache: "DEBUG"
+    com.example.llmcache.service.llmprovider: "TRACE"

@@ -1,24 +1,26 @@
 #!/bin/bash
 
-echo "🚀 Starting LLM Vector Cache Application"
+echo "🚀 LLM Vector Cache - Startup Script Selector"
+echo ""
+echo "Please choose your LLM provider:"
+echo "1) OpenAI (requires OPENAI_API_KEY)"
+echo "2) Ollama (requires local Ollama server)"
+echo ""
+read -p "Enter your choice (1 or 2): " choice
 
-# Check if OPENAI_API_KEY is set
-if [ -z "$OPENAI_API_KEY" ]; then
-    echo "❌ Error: OPENAI_API_KEY environment variable is not set"
-    echo "   Please set it with: export OPENAI_API_KEY=your_api_key_here"
-    exit 1
-fi
-
-# Start Redis if not running
-echo "🔧 Starting Redis..."
-cd docker
-docker-compose up -d redis
-cd ..
-
-# Wait for Redis to be ready
-echo "⏳ Waiting for Redis to be ready..."
-sleep 5
-
-# Start the application
-echo "🏃 Starting Spring Boot application..."
-mvn spring-boot:run
+case $choice in
+    1)
+        echo "Starting with OpenAI provider..."
+        ./start-openai.sh
+        ;;
+    2)
+        echo "Starting with Ollama provider..."
+        ./start-ollama.sh
+        ;;
+    *)
+        echo "❌ Invalid choice. Please run:"
+        echo "   ./start-openai.sh  (for OpenAI)"
+        echo "   ./start-ollama.sh  (for Ollama)"
+        exit 1
+        ;;
+esac

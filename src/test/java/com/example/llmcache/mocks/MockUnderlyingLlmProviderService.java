@@ -3,15 +3,15 @@ package com.example.llmcache.mocks;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import com.example.llmcache.service.LlmService;
+import com.example.llmcache.service.UnderlyingLlmProviderService;
 
-public class MockLlmService extends LlmService {
+public class MockUnderlyingLlmProviderService extends UnderlyingLlmProviderService {
   private MockFramework.CallTracker callTracker = new MockFramework.CallTracker();
   private String generateResponseResult = "Default mock response";
   private RuntimeException generateResponseException;
 
-  public MockLlmService() {
-    super(null, null, null);
+  public MockUnderlyingLlmProviderService() {
+    super(java.util.List.of(new MockLlmProvider("mock", 1536, true)));
   }
 
   public void setGenerateResponseResult(String result) {

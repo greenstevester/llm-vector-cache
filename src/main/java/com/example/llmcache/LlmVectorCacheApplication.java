@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 @EnableAsync
 public class LlmVectorCacheApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(LlmVectorCacheApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(LlmVectorCacheApplication.class, args);
+  }
 }
