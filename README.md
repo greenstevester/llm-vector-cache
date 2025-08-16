@@ -1,5 +1,13 @@
 # LLM Vector Cache with Spring Boot
 
+[![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://www.java.com/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen)](https://spring.io/projects/spring-boot)
+[![Maven](https://img.shields.io/badge/Maven-3.6%2B-C71A36)](https://maven.apache.org/)
+[![Redis](https://img.shields.io/badge/Redis-Stack-DC382D)](https://redis.io/docs/stack/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-API-412991)](https://openai.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A high-performance LLM cache implementation using vector similarity matching with Redis and OpenAI embeddings.
 
 ## Features
@@ -147,4 +155,4 @@ The application provides several monitoring endpoints:
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
