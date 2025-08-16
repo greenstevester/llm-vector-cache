@@ -9,6 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import redis.clients.jedis.JedisPool;
@@ -35,6 +36,8 @@ public class RedisConfig {
     // Configure ObjectMapper with JavaTimeModule for LocalDateTime support
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.activateDefaultTyping(
+        LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 
     GenericJackson2JsonRedisSerializer serializer =
         new GenericJackson2JsonRedisSerializer(objectMapper);
