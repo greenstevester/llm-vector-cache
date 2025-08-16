@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Vector Cache - Dashboard</title>
+    <style>
+        :root {
+            --bg: #0b0c10;
+            --fg: #e8e8e8;
+            --accent: #8aff80;
+            --dim: #a0a0a0;
+        }
+        
+        html, body { height: 100% }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Liberation Mono", "Courier New", monospace;
+            color: var(--fg);
+            background: radial-gradient(1200px 800px at 70% -20%, #182020 0%, #0e1111 40%, var(--bg) 100%), #0a0a0a;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Announcement ticker */
+        .ticker {
+            position: relative;
+            background: #101418;
+            border-bottom: 1px solid #1e2329;
+            color: #bfefff;
+            overflow: hidden;
+        }
+        .ticker__track {
+            display: flex;
+            gap: 4rem;
+            white-space: nowrap;
+            padding: 0.6rem 0;
+            animation: slide 25s linear infinite;
+            will-change: transform;
+        }
+        .ticker__item { opacity: 0.9; letter-spacing: .02em }
+        .ticker__dot { opacity: .35; margin: 0 .5rem }
+        @keyframes slide {
+            from { transform: translateX(0) }
+            to   { transform: translateX(-50%) }
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            min-height: 90vh;
+            display: grid;
+            place-items: center;
+            padding: 3rem 2rem;
+            isolation: isolate;
+        }
+
+        /* Terminal Window */
+        .terminal {
+            width: min(1200px, 92vw);
+            border: 1px solid #1f2a22;
+            background: linear-gradient(180deg, rgba(0,0,0,.45), rgba(0,0,0,.6));
+            box-shadow:
+                0 0 70px rgba(0,255,140,.06),
+                inset 0 0 40px rgba(0,255,140,.05);
+            border-radius: 14px;
+            padding: 1.25rem 1.25rem 1rem;
+            position: relative;
+        }
+        .terminal__header {
+            display: flex; 
+            align-items: center; 
+            gap: .5rem; 
+            padding-bottom: .75rem; 
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #1c2a1f; 
+            color: var(--dim); 
+            font-size: .9rem;
+        }
+        .dot { width: .75rem; height: .75rem; border-radius: 50% }
+        .dot.red { background: #ff5f56 } 
+        .dot.yellow { background: #ffbd2e } 
+        .dot.green { background: #27c93f }
+
+        /* CRT Effects */
+        .crt::before, .crt::after {
+            content: "";
+            position: absolute; 
+            inset: 0; 
+            pointer-events: none; 
+            z-index: 2;
+        }
+        /* Scanlines */
+        .crt::before {
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(255,255,255,.04) 0px,
+                rgba(255,255,255,.04) 1px,
+                transparent 2px,
+                transparent 3px
+            );
+            mix-blend-mode: soft-light;
+        }
+        /* Vignette */
+        .crt::after {
+            background: radial-gradient(120% 70% at 50% 50%, transparent 0%, transparent 60%, rgba(0,0,0,.55) 100%);
+        }
+
+        .ascii {
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(138,255,128,.35), 0 0 30px rgba(138,255,128,.15);
+            line-height: 1.05; 
+            font-size: clamp(10px, 1.35vw, 16px);
+            white-space: pre; 
+            overflow: auto; 
+            margin: 0 0 .5rem 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid #1f2a22;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .stat-card:hover {
+            background: rgba(0, 0, 0, 0.35);
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(138, 255, 128, 0.1);
+        }
+        
+        .stat-title {
+            font-size: 0.75rem;
+            color: var(--dim);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.8;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+            text-shadow: 0 0 10px rgba(138, 255, 128, 0.3);
+        }
+        
+        .stat-subtitle {
+            font-size: 0.8rem;
+            color: #bfc7bf;
+            opacity: 0.9;
+        }
+        
+        .cost-savings {
+            border-color: #1f2a22;
+        }
+        
+        .cache-performance {
+            border-color: #1f2a22;
+        }
+        
+        .system-status {
+            border-color: #1f2a22;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #5fff5f);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(138, 255, 128, 0.3);
+        }
+
+        .clockline {
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            margin: .25rem 0 0.75rem;
+            color: #c2ffd0; 
+            font-weight: 600; 
+            letter-spacing: .04em;
+        }
+        .blink {
+            animation: blink 1.1s steps(1,end) infinite;
+        }
+        @keyframes blink { 50% { opacity:.15 } }
+
+        .subtle {
+            color: #bfc7bf; 
+            opacity: .9; 
+            margin: .25rem 0 0;
+        }
+
+        /* Matrix fade-in animations */
+        .fade-in-text {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .fade-in-text.revealed {
+            opacity: 1;
+        }
+        
+        .matrix-char {
+            display: inline-block;
+            opacity: 0;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(138, 255, 128, 0.5);
+            animation: matrixReveal 0.1s ease forwards;
+        }
+        
+        @keyframes matrixReveal {
+            0% { 
+                opacity: 0; 
+                color: #ff0000;
+                text-shadow: 0 0 10px #ff0000;
+                transform: scale(1.2);
+            }
+            50% { 
+                opacity: 1; 
+                color: #ffff00;
+                text-shadow: 0 0 15px #ffff00;
+                transform: scale(1.1);
+            }
+            100% { 
+                opacity: 1; 
+                color: var(--accent);
+                text-shadow: 0 0 10px rgba(138, 255, 128, 0.3);
+                transform: scale(1);
+            }
+        }
+        
+        .typing-effect {
+            overflow: hidden;
+            border-right: 2px solid var(--accent);
+            white-space: nowrap;
+            animation: typing 2s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--accent) }
+        }
+        
+        .stats-appear {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        
+        .stats-appear.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--dim);
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .refresh-note {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #1f2a22;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            .ascii {
+                font-size: 8px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+        }
+    </style>
+    <script>
+        // Live clock in 12h AM/PM
+        function updateClock(){
+            const el = document.getElementById('clock');
+            const now = new Date();
+            let h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12; if (h === 0) h = 12;
+            const pad = n => String(n).padStart(2,'0');
+            el.textContent = `${pad(h)}:${pad(m)}:${pad(s)}${ampm}`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Matrix-style text reveal animation
+        class MatrixTextReveal {
+            constructor(element, options = {}) {
+                this.element = element;
+                this.originalText = element.textContent;
+                this.options = {
+                    revealDelay: options.revealDelay || 50,
+                    revealDuration: options.revealDuration || 2000,
+                    characters: options.characters || '01!@#$%^&*()_+-=[]{}|;:,.<>?',
+                    ...options
+                };
+                this.isRevealing = false;
+            }
+
+            async reveal() {
+                if (this.isRevealing) return;
+                this.isRevealing = true;
+                
+                const chars = this.originalText.split('');
+                const length = chars.length;
+                
+                // Start with random characters
+                this.element.textContent = this.generateRandomString(length);
+                
+                // Gradually reveal real characters
+                for (let i = 0; i < length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, this.options.revealDelay));
+                    
+                    let currentText = '';
+                    for (let j = 0; j < length; j++) {
+                        if (j <= i) {
+                            currentText += chars[j];
+                        } else {
+                            currentText += this.getRandomChar();
+                        }
+                    }
+                    this.element.textContent = currentText;
+                }
+                
+                this.isRevealing = false;
+            }
+
+            generateRandomString(length) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    if (this.originalText[i] === ' ') {
+                        result += ' ';
+                    } else {
+                        result += this.getRandomChar();
+                    }
+                }
+                return result;
+            }
+
+            getRandomChar() {
+                return this.options.characters.charAt(Math.floor(Math.random() * this.options.characters.length));
+            }
+        }
+
+        // Initialize animations on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate ASCII art
+            const asciiElement = document.querySelector('.ascii');
+            if (asciiElement) {
+                const asciiReveal = new MatrixTextReveal(asciiElement, {
+                    revealDelay: 30,
+                    characters: '01#*%@&$+=<>?[]{}|'
+                });
+                setTimeout(() => asciiReveal.reveal(), 500);
+            }
+
+            // Animate subtitle texts
+            const subtitleElements = document.querySelectorAll('.subtle.fade-in-text');
+            subtitleElements.forEach((element, index) => {
+                const subtitleReveal = new MatrixTextReveal(element, {
+                    revealDelay: 40,
+                    characters: '01_-=+[]{}|;:,.<>?'
+                });
+                setTimeout(() => subtitleReveal.reveal(), 1500 + (index * 500));
+            });
+
+            // Animate ticker text with periodic scrambling
+            const tickerItems = document.querySelectorAll('.ticker__item');
+            tickerItems.forEach((item, index) => {
+                // Only animate static text items (first item in this case)
+                if (index === 0) {
+                    const tickerReveal = new MatrixTextReveal(item, {
+                        revealDelay: 30,
+                        characters: '01#*%@&$'
+                    });
+                    setTimeout(() => tickerReveal.reveal(), 100);
+                    
+                    // Periodic re-scramble for effect (cleared on page refresh)
+                    setInterval(() => {
+                        if (Math.random() < 0.1) { // 10% chance every interval
+                            tickerReveal.reveal();
+                        }
+                    }, 5000);
+                }
+            });
+
+            // Animate stats cards with staggered timing
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.classList.add('stats-appear');
+                setTimeout(() => {
+                    card.classList.add('visible');
+                    
+                    // Animate stat values
+                    const statValue = card.querySelector('.stat-value');
+                    if (statValue) {
+                        const valueReveal = new MatrixTextReveal(statValue, {
+                            revealDelay: 60,
+                            characters: '0123456789$%.'
+                        });
+                        setTimeout(() => valueReveal.reveal(), 200);
+                    }
+                }, 2000 + (index * 150));
+            });
+
+            // Animate terminal header
+            const terminalHeader = document.querySelector('.terminal__header span:last-child');
+            if (terminalHeader) {
+                const headerReveal = new MatrixTextReveal(terminalHeader, {
+                    revealDelay: 50,
+                    characters: '/-\\|_'
+                });
+                setTimeout(() => headerReveal.reveal(), 100);
+            }
+        });
+
+        // Auto-refresh every 30 seconds
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</head>
+<body>
+
+<!-- Announcement Ticker -->
+<div class="ticker" aria-label="cache status">
+    <div class="ticker__track" role="marquee" aria-live="polite">
+        <div class="ticker__item">llm vector cache — dual-layer semantic matching</div>
+        <div class="ticker__dot">•</div>
+        <div class="ticker__item" th:text="'hit rate: ' + ${#numbers.formatDecimal(stats.hitRatePercentage, 1, 1)} + '%'">hit rate: 95.2%</div>
+        <div class="ticker__dot">•</div>
+        <div class="ticker__item" th:text="'total saved: $' + ${#numbers.formatDecimal(stats.costSavings.totalSaved, 1, 2)}">total saved: $4.36</div>
+        <div class="ticker__dot">•</div>
+        <div class="ticker__item" th:text="${stats.totalCacheEntries} + ' cached embeddings'">1,247 cached embeddings</div>
+        
+        <!-- second copy for seamless loop -->
+        <div class="ticker__item">llm vector cache — dual-layer semantic matching</div>
+        <div class="ticker__dot">•</div>
+        <div class="ticker__item" th:text="'hit rate: ' + ${#numbers.formatDecimal(stats.hitRatePercentage, 1, 1)} + '%'">hit rate: 95.2%</div>
+        <div class="ticker__dot">•</div>
+        <div class="ticker__item" th:text="'total saved: $' + ${#numbers.formatDecimal(stats.costSavings.totalSaved, 1, 2)}">total saved: $4.36</div>
+        <div class="ticker__dot">•</div>
+        <div class="ticker__item" th:text="${stats.totalCacheEntries} + ' cached embeddings'">1,247 cached embeddings</div>
+    </div>
+</div>
+
+<!-- Hero Terminal -->
+<section class="hero crt">
+    <div class="terminal" role="region" aria-label="llm cache dashboard">
+        <div class="terminal__header">
+            <span class="dot red" aria-hidden="true"></span>
+            <span class="dot yellow" aria-hidden="true"></span>
+            <span class="dot green" aria-hidden="true"></span>
+            <span style="margin-left:.5rem">/ llm-vector-cache</span>
+        </div>
+
+        <pre class="ascii" aria-hidden="true">
+ _ _                          _                                 _          
+| | |_ __ ___   ________   ___| |_ ___  _ __         ___  __ _  ___| |__   ___ 
+| | | '_ ` _ \ |______\ \ / / _ \ __/ _ \| '__|______ / __|/ _` |/ __| '_ \ / _ \
+| | | | | | | |        \ V /  __/ || (_) | |  |_____| (__| (_| | (__| | | |  __/
+|_|_|_| |_| |_|         \_/ \___|\__\___/|_|        \___|\__,_|\___|_| |_|\___|
+</pre>
+
+        <div class="clockline">
+            <div id="clock">--:--:--</div>
+            <div class="blink">▍</div>
+            <div class="subtle fade-in-text">semantic similarity caching</div>
+        </div>
+
+        <div class="subtle fade-in-text">
+            dual-layer cache with exact matching and vector similarity — saving costs through intelligent request deduplication.
+        </div>
+        
+        <div class="stats-grid">
+            <!-- Cache Performance -->
+            <div class="stat-card cache-performance">
+                <div class="stat-title">Cache Hit Rate</div>
+                <div class="stat-value" th:text="${#numbers.formatDecimal(stats.hitRatePercentage, 1, 1)} + '%'">95.2%</div>
+                <div class="stat-subtitle" th:text="${stats.cacheHits} + ' hits / ' + ${stats.totalRequests} + ' requests'">1,247 hits / 1,309 requests</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" th:style="'width: ' + ${stats.hitRatePercentage} + '%'"></div>
+                </div>
+            </div>
+            
+            <!-- Total Cache Entries -->
+            <div class="stat-card system-status">
+                <div class="stat-title">Cache Entries</div>
+                <div class="stat-value" th:text="${stats.totalCacheEntries}">1,247</div>
+                <div class="stat-subtitle">Vector embeddings stored</div>
+            </div>
+            
+            <!-- Cache Misses -->
+            <div class="stat-card system-status">
+                <div class="stat-title">Cache Misses</div>
+                <div class="stat-value" th:text="${stats.cacheMisses}">62</div>
+                <div class="stat-subtitle">Requests to OpenAI API</div>
+            </div>
+            
+            <!-- Cost Per Request -->
+            <div class="stat-card cost-savings">
+                <div class="stat-title">Cost Per Request</div>
+                <div class="stat-value" th:text="'$' + ${#numbers.formatDecimal(stats.costSavings.costPerRequest, 1, 4)}">$0.0035</div>
+                <div class="stat-subtitle">Avg OpenAI API cost</div>
+            </div>
+            
+            <!-- Total Savings -->
+            <div class="stat-card cost-savings">
+                <div class="stat-title">Total Saved</div>
+                <div class="stat-value" th:text="'$' + ${#numbers.formatDecimal(stats.costSavings.totalSaved, 1, 2)}">$4.36</div>
+                <div class="stat-subtitle">Lifetime cost avoidance</div>
+            </div>
+            
+            <!-- Monthly Savings Estimate -->
+            <div class="stat-card cost-savings">
+                <div class="stat-title">Est. Monthly Savings</div>
+                <div class="stat-value" th:text="'$' + ${#numbers.formatDecimal(stats.costSavings.estimatedMonthlySavings, 1, 2)}">$130.80</div>
+                <div class="stat-subtitle">Based on current usage</div>
+            </div>
+            
+            <!-- Yearly Savings Estimate -->
+            <div class="stat-card cost-savings">
+                <div class="stat-title">Est. Yearly Savings</div>
+                <div class="stat-value" th:text="'$' + ${#numbers.formatDecimal(stats.costSavings.estimatedYearlySavings, 1, 2)}">$1,591.40</div>
+                <div class="stat-subtitle">ROI potential</div>
+            </div>
+            
+            <!-- Load Impact -->
+            <div class="stat-card cache-performance">
+                <div class="stat-title">OpenAI Load Reduction</div>
+                <div class="stat-value" th:text="${#numbers.formatDecimal(stats.hitRatePercentage, 1, 1)} + '%'">95.2%</div>
+                <div class="stat-subtitle">API requests avoided</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" th:style="'width: ' + ${stats.hitRatePercentage} + '%'"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>🚀 LLM Vector Cache Dashboard • Real-time performance monitoring</p>
+            <p>Powered by Spring Boot with dual-layer semantic caching</p>
+        </div>
+    </div>
+</section>
+
+<div class="refresh-note">
+    🔄 Auto-refresh: 30s
+</div>
+</body>
+</html>
