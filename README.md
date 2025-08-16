@@ -159,9 +159,13 @@ curl http://localhost:8080/api/llm/health
 curl -X POST http://localhost:8080/api/llm/generate \
   -H "Content-Type: application/json" \
   -d '{
-    "prompt": "What is the capital of France?",
-    "options": {"model": "gpt-3.5-turbo"}
-  }'
+  "prompt": "Tell me the capital of France",
+  "options": {
+    "model": "qwen2.5-coder:3b",
+    "temperature": 0.7,
+    "max_tokens": 100
+  }
+}'
 
 # Check cache stats
 curl http://localhost:8080/api/llm/cache/stats

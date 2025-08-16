@@ -1,0 +1,50 @@
+{
+  "info": {
+    "name": "Simple Question Load Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Simple Question (qwen2.5-coder)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Tell me the capital of France\",\n  \"options\": {\n    \"model\": \"qwen2.5-coder:3b\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/llm/generate",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "llm", "generate"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Response time is acceptable', function () {",
+              "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+              "});",
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    }
+  ]
+}

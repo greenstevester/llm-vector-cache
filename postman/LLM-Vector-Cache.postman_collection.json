@@ -119,11 +119,11 @@
     {
       "item": [
         {
-          "name": "Simple Question (GPT-3.5)",
+          "name": "Simple Question (qwen2.5-coder)",
           "request": {
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"prompt\": \"What is the capital of France?\",\n  \"options\": {\n    \"model\": \"gpt-3.5-turbo\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
+              "raw": "{\n  \"prompt\": \"Tell me the capital of France\",\n  \"options\": {\n    \"model\": \"qwen2.5-coder:3b\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
             },
             "description": "Simple factual question that should be cached after first call",
             "header": [
