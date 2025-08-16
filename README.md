@@ -88,6 +88,44 @@ GET /api/llm/health
 POST /api/llm/cache/evict
 ```
 
+## Testing with Postman
+
+A comprehensive Postman collection is included for testing all API endpoints.
+
+### Importing the Collection
+
+1. Open Postman
+2. Click **Import** button (or File → Import)
+3. Select the file: `LLM-Vector-Cache.postman_collection.json`
+4. Click **Import**
+
+### Running the Collection
+
+1. Set your environment variables (optional):
+   - Click the **Environment** quick look (eye icon)
+   - Add `baseUrl` if not using default `http://localhost:8080`
+
+2. Run individual requests:
+   - Navigate to the imported collection
+   - Choose from 16+ pre-configured requests organized in folders:
+     - **Health & Monitoring**: System health checks
+     - **LLM Generation**: Various prompt examples
+     - **Cache Management**: Cache control operations
+     - **Test Scenarios**: Cache hit/miss testing
+
+3. Run the entire collection:
+   - Right-click the collection → **Run collection**
+   - Configure iterations and delays as needed
+   - Click **Run LLM Vector Cache API**
+
+### Collection Features
+
+- **Pre-configured Examples**: 16+ ready-to-use API requests
+- **Semantic Testing**: Examples to test cache similarity matching
+- **Error Scenarios**: Test cases for error handling
+- **Response Validation**: Automatic response time checks
+- **Multiple Models**: Examples for GPT-3.5 and GPT-4
+
 ## Configuration
 
 Key configuration options in `application.yml`:
@@ -111,6 +149,55 @@ The system uses a dual-layer caching approach:
 3. **Similarity Calculation**: Cosine similarity between query and cached embeddings
 4. **Threshold Matching**: Returns cached response if similarity > threshold
 5. **LLM Fallback**: Calls OpenAI API if no cache hit, then caches the result
+
+## Redis Vector Capabilities
+
+This project leverages [Redis Stack](https://redis.io/docs/stack/) with the [RediSearch module](https://redis.io/docs/stack/search/) for advanced vector similarity search capabilities:
+
+### Key Technologies
+
+- **Jedis Client**: We use [Jedis 5.0+](https://github.com/redis/jedis) with built-in RediSearch support for vector operations
+- **Redis Stack**: Includes [RediSearch 2.0+](https://redis.io/docs/stack/search/reference/vectors/) with native vector similarity search
+- **Vector Indexing**: Supports FLAT and HNSW indexing algorithms for efficient k-NN searches
+
+### Vector Search Features
+
+- **Embedding Storage**: Store OpenAI embeddings (1536 dimensions for text-embedding-ada-002) as FLOAT32 vectors
+- **Cosine Similarity**: Built-in distance metrics including COSINE, L2, and IP (Inner Product)
+- **Hybrid Queries**: Combine vector similarity with filters on metadata fields
+- **Real-time Indexing**: Automatic indexing of new vectors without rebuilding
+- **Scalability**: Handles millions of vectors with sub-millisecond query times
+
+### Implementation Details
+
+```java
+// Vector index creation in Redis
+FT.CREATE idx:cache 
+  ON HASH 
+  PREFIX 1 cache: 
+  SCHEMA 
+    embedding VECTOR FLAT 6 
+      TYPE FLOAT32 
+      DIM 1536 
+      DISTANCE_METRIC COSINE
+    prompt TEXT 
+    response TEXT
+    created_at NUMERIC
+```
+
+### Performance Optimizations
+
+- **Pre-filtering**: Reduces search space using metadata filters before vector search
+- **Batch Operations**: Pipeline multiple Redis commands for improved throughput
+- **Connection Pooling**: Jedis pool configuration for optimal resource utilization
+- **Lazy Loading**: Embeddings generated only when needed for semantic search
+
+### Learn More
+
+- [Redis Vector Similarity Docs](https://redis.io/docs/stack/search/reference/vectors/)
+- [RediSearch Query Syntax](https://redis.io/docs/stack/search/reference/query_syntax/)
+- [Jedis RediSearch Integration](https://github.com/redis/jedis/tree/master/src/main/java/redis/clients/jedis/search)
+- [Vector Database Benchmarks](https://redis.io/docs/stack/search/reference/vectors/#vector-similarity-examples)
 
 ## Production Deployment
 
@@ -144,6 +231,10 @@ The application provides several monitoring endpoints:
 - `/actuator/health`: Application health status
 - `/actuator/metrics`: Application metrics
 - `/api/llm/cache/stats`: Cache-specific statistics
+
+## Inspired By
+
+This project was inspired by [Raul Junco's post on X](https://x.com/RaulJuncoV/status/1954876732261253578) about implementing LLM caching with vector similarity search. Thanks for sharing the concept and sparking the idea for this implementation!
 
 ## Contributing
 
