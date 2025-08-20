@@ -5,25 +5,6 @@
   },
   "item": [
     {
-      "name": "Simple Question (qwen2.5-coder)",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"prompt\": \"Tell me the capital of France\",\n  \"options\": {\n    \"model\": \"qwen2.5-coder:3b\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
-        },
-        "url": {
-          "raw": "{{baseUrl}}/api/llm/generate",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "llm", "generate"]
-        }
-      },
       "event": [
         {
           "listen": "test",
@@ -38,7 +19,32 @@
             ]
           }
         }
-      ]
+      ],
+      "name": "Simple Question (qwen2.5-coder)",
+      "request": {
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Tell me the capital of France\",\n  \"options\": {\n    \"model\": \"qwen2.5-coder:3b\",\n    \"temperature\": 0.7,\n    \"max_tokens\": 100\n  }\n}"
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "method": "POST",
+        "url": {
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "llm",
+            "generate"
+          ],
+          "raw": "{{baseUrl}}/api/llm/generate"
+        }
+      }
     }
   ],
   "variable": [
