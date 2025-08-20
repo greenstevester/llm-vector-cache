@@ -71,3 +71,7 @@ replay_pid*
 ### Spring Boot ###
 *.pid
 spring.log
+
+### Newman Test Results ###
+newman/*-results.json
+newman/*-load-test.json

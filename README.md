@@ -8,7 +8,12 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)](https://www.docker.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A high-performance LLM cache implementation using vector similarity matching with Redis and multiple LLM providers (OpenAI, Ollama).
+A high-performance LLM cache implementation (using vector similarity matching via Redis).
+
+Currently works with 2 LLM providers (OpenAI, Ollama).
+
+The primary use case: is for your LLM enabled application, where certain functions are delegated to a chosen LLM and return that result to the user (i.e., canonical one is a customer support chat application). The value proposition is that the LLM is only called once for a given prompt, and the result is cached for future use.
+
 
 ## Features
 
@@ -242,6 +247,67 @@ A comprehensive Postman collection is included for testing all API endpoints.
 - **Error Scenarios**: Test cases for error handling
 - **Response Validation**: Automatic response time checks
 - **Multiple Models**: Examples for GPT-3.5 and GPT-4
+
+## Load Testing with Newman
+
+Newman is Postman's command-line collection runner for automated testing and load testing.
+
+### Installing Newman
+
+```bash
+# Install Newman globally via npm
+npm install -g newman
+
+# Verify installation
+newman --version
+```
+
+### Running Load Tests
+
+The project includes dedicated Newman test collections in the `newman/` directory:
+
+```bash
+# Run the Simple Question load test (100 iterations)
+newman run newman/simple-question-test.json \
+  --iteration-count 100 \
+  --delay-request 50 \
+  --reporters cli,json \
+  --reporter-json-export newman/load-test-results.json
+
+# Run the full Postman collection
+newman run postman/LLM-Vector-Cache.postman_collection.json \
+  --folder "LLM Generation" \
+  --iteration-count 50
+
+# Run with environment variables
+newman run newman/simple-question-test.json \
+  --env-var "baseUrl=http://localhost:8080" \
+  --iteration-count 200
+```
+
+### Load Test Results
+
+Typical performance metrics for the Simple Question test:
+- **Success Rate**: 100% (all requests succeed)
+- **Average Response Time**: 5ms (after first request cached)
+- **Cache Hit Performance**: Sub-10ms response times
+- **Throughput**: ~15 requests/second with 50ms delay
+
+### Custom Load Testing
+
+Create custom Newman tests by:
+1. Creating a new Postman collection with your test requests
+2. Exporting as JSON to the `newman/` directory
+3. Running with Newman CLI
+
+Example custom test:
+```bash
+# High-volume test with no delay
+newman run newman/your-test.json \
+  --iteration-count 1000 \
+  --delay-request 0 \
+  --timeout-request 10000
+```
 
 ## Configuration
 
